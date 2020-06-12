@@ -1,0 +1,5 @@
+numpy==1.16.4
+spacy==0.12
+newspaper3k==0.2.8
+en-core-web-sm==2.2.5
+
