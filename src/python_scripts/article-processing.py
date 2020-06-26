@@ -15,9 +15,11 @@ import requests, mediacloud.api
 from collect_articles import article_urls
 from bs4 import BeautifulSoup
 import re
-
+import pandas as pd
 def main():
     urls = article_urls(0, 1000, 39000)
+    
+    complete = []
     for URL in urls:
         #URL = 'https://abcnews.go.com/Politics/white-house-odd-couple-trump-boltons-tumultuous-relationship/story?id=71323127'
         article = Article(URL)
@@ -25,6 +27,12 @@ def main():
         article.parse()
         main_body = article.text #Main body of Article
         attempted_authors = article.authors
+        sentences = sent_tokenize(main_body)
+
+        genderize = Genderize(
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
+            api_key='66982c609ec00aba67eee6fb146f6210',
+            timeout=30.0)
 
         #HTML Processing
         fp = urllib.request.urlopen(URL)
@@ -33,27 +41,67 @@ def main():
         mystr = mybytes.decode("utf8")
         fp.close()
         soup = BeautifulSoup(mystr, 'lxml')
-        author = soup.find("div", class_="Byline__Author").text #Byline through HTML 
-
-        authors = author_names(attempted_authors) #Returns array of Authors through NER
-        gender_of_author = Genderize().get([authors.split()[0]])
-        sentences = sent_tokenize(main_body)
-        sources2 = extract_sources(sentences)
-        sources= extract_sources_displacy(sentences)
-        source_genders = source_gender(sources)
         
+        #author = author_names(attempted_authors) #Returns array of Authors through NER
+
+        try:       
+            byline = soup.find("div", class_="Byline__Author").text  #Byline through HTML 
+        except:
+            byline = ''
+        #byline = genderize.get([author.split()[0]]) #Not working for multiple authors yet  
+        authors = author_from_byline(byline)
+
+    
+        author_gender = gender_of_author(authors)
+        sources= extract_sources_displacy(sentences)
+        source_genders = source_gender(sources, sentences)
+
+        
+        #sources2 = extract_sources(sentences)
+
         count_he = source_genders.count('male')
         count_she = source_genders.count('female')
-      
-        #Write to JSON
+
+        complete_row = [article.title, authors, author_gender, sources, count_he, count_she] #Create row for article
+        complete.append(complete_row)
+        #write_to_json(article.title, author, gender_of_author, sources, count_he, count_she)
+
+    complete_np = np.array(complete)
+    df = pd.DataFrame(complete_np)
+    df.to_csv('complete_article_data.csv')
+def gender_of_author(authors):
+    genderize = Genderize(
+        user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
+        api_key='66982c609ec00aba67eee6fb146f6210',
+        timeout=30.0)
+    #Return first name
+    first_names = []
+    for author in authors:
+        first_names.append(author.split()[0])
+    
+    genders_full = genderize.get(first_names)
+    genders =[]
+    for d in genders_full:
+        genders.append(d['gender'])
+    return genders
+def author_from_byline(byline):
+    nlp = spacy.load('en_core_web_sm') #Load english
+    docx = nlp(byline.lower())
+    authors = []
+    for ent in docx.ents:
+        if ent.label_ == 'PERSON':
+            authors.append(ent.text)
+    return authors
+def write_to_json(title, authors, gender_of_author, sources, count_male, count_female):
+     #Write to JSON
         # Data to be written
         dictionary ={ 
             "title" : article.title, 
             "Author" : authors, 
             "Gender of Author": gender_of_author,
             "Sources": np.array_str(sources),
-            "# of male sources" : count_he, 
-            "# of female sources" : count_she
+            "# of male sources" : count_male, 
+            "# of female sources" : count_female
         } 
     
         # Serializing json  
@@ -100,10 +148,14 @@ def extract_sources_displacy(sentences):
             split_sent = re.findall(r"[\w']+|[.,!?;]", sent)
             if source in split_sent:
                 #split_sent = sent.split() #Split sentence into list
-                index = split_sent.index(source)
-                sources_full_name.append(split_sent[index - 1] + " " + split_sent[index])
+                #index = split_sent.index(source)
+                #sources_full_name.append(split_sent[index - 1] + " " + split_sent[index])
+                docx = nlp(sent)
+                for ent in docx.ents:
+                    if ent.label_ == 'PERSON' and source in ent.text:
+                        sources_full_name.append(ent.text)
                 break
-    sources_full_name = np.array(sources_full_name)
+    #sources_full_name = np.array(sources_full_name)
     return sources_full_name 
            
 
@@ -140,19 +192,37 @@ def extract_sources(sentences):
 
     return sources
     
-def source_gender(sources):
+def source_gender(sources, sentences):
+    nlp = spacy.load('en_core_web_sm')
+    genderize = Genderize(
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
+            api_key='66982c609ec00aba67eee6fb146f6210',
+            timeout=30.0)
     #Check for no identified sources
     if len(sources) == 0:
         genders = ['None']
     else:
         source_first_name = []
         for source in sources:
+            # pronouns = []
+            # #Find source in sentence
+            # for i, sentence in enumerate(sentences):
+            #     if source in sentences[i]:
+            #         doc = nlp(sentences[i])
+            #         doc_2 = nlp(sentences[i+1])
+            #         for token in doc:
+            #             if token.pos_ == 'PRON':
+            #                 pronouns.append(token.text)
+            #         for token in doc_2:
+            #             if token.pos_ == 'PRON':
+            #                 pronouns.append(token.text)        
+            #         break
+            
             source_first_name.append(source.split()[0])
-        source_genders = Genderize().get([source_first_name])
+        source_genders = genderize.get([source_first_name])
         genders =[]
         for d in source_genders:
             genders.append(d['gender'])
-
     return genders
 def author_names(attempted_authors):
     entities = []

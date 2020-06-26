@@ -79,5 +79,8 @@ dependencies:
   - zipp=3.1.0=py_0
   - zlib=1.2.11=h2fa13f4_1006
   - zstd=1.4.4=h9f78265_3
+  - pip:
+    - gender-guesser==0.4.0
+    - genderize==0.3.1
+    - mediacloud==3.12.0
 prefix: C:\Users\isabe\Anaconda\envs\analysis_2
-
