@@ -48,27 +48,25 @@ def main():
             byline = soup.find("div", class_="Byline__Author").text  #Byline through HTML 
         except:
             byline = ''
-        #byline = genderize.get([author.split()[0]]) #Not working for multiple authors yet  
-        authors = author_from_byline(byline)
 
-    
+        authors = author_from_byline(byline)
         author_gender = gender_of_author(authors)
         sources= extract_sources_displacy(sentences)
         source_genders = source_gender(sources, sentences)
 
-        
         #sources2 = extract_sources(sentences)
 
         count_he = source_genders.count('male')
         count_she = source_genders.count('female')
 
-        complete_row = [article.title, authors, author_gender, sources, count_he, count_she] #Create row for article
+        complete_row = [article.title, authors, author_gender, sources, count_he, count_she, URL] #Create row for article
         complete.append(complete_row)
         #write_to_json(article.title, author, gender_of_author, sources, count_he, count_she)
 
     complete_np = np.array(complete)
-    df = pd.DataFrame(complete_np)
+    df = pd.DataFrame(complete_np, columns = ['Title', 'Author', 'Gender of Author', 'Sources', 'Male Sources', 'Female Sources', 'url'])
     df.to_csv('complete_article_data.csv')
+
 def gender_of_author(authors):
     genderize = Genderize(
         user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
@@ -84,6 +82,7 @@ def gender_of_author(authors):
     for d in genders_full:
         genders.append(d['gender'])
     return genders
+
 def author_from_byline(byline):
     nlp = spacy.load('en_core_web_sm') #Load english
     docx = nlp(byline.lower())
@@ -92,6 +91,7 @@ def author_from_byline(byline):
         if ent.label_ == 'PERSON':
             authors.append(ent.text)
     return authors
+    
 def write_to_json(title, authors, gender_of_author, sources, count_male, count_female):
      #Write to JSON
         # Data to be written
