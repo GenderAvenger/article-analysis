@@ -3,7 +3,7 @@ const unfluff = require('unfluff');
 const cheerio = require('cheerio');
 const request = require('request');
 //Variables and Consts
-const url = 'https://www.nbcnews.com/news/us-news/everybody-loved-george-familiar-refrain-about-man-who-showed-everybody-n1227371'
+const url = 'https://abcnews.go.com/Politics/wireStory/canceling-ivanka-trump-spurs-backlash-kansas-college-71174430?cid=clicksource_4380645_2_heads_hero_live_headlines_hed'
 
 //Main
 
