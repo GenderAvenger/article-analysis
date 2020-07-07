@@ -8,7 +8,7 @@ python 3.7.6
 You can use either a conda environment or a pip environment. 
 
 To use a conda environment    
-`conda env create -f environmemt.yml`
+`conda env create -f analysis_2.yml`
 
 To use a pip environment open command line or terminal and type   
 `pip install -r requirements.txt`
