@@ -1,5 +1,5 @@
 # article-analysis
-Analyze the bylines and sources of news articles to see how women are represented. article-processing takes URLS of articles and outputs the bylines and sources cited in the article as well as predicted genders of these names. Data is aggregated into a csv table, an example of the output data is shown in collect
+Analyze the bylines and sources of news articles to see how women are represented. article-processing takes URLS of articles and outputs the bylines and sources cited in the article as well as predicted genders of these names. Data is aggregated into a csv table, an example of the output data is shown in complete_article_data.csv
 
 ### Technologies
 python 3.7.6
@@ -14,7 +14,7 @@ To use a pip environment open command line or terminal and type
 `pip install -r requirements.txt`
 
 ### Use
-Open collect-articles script. Using MIT's MediaCloud Source Manager Tool look up ID for the source you are looking for. 
+Using MIT's MediaCloud Source Manager Tool look up ID for the source you are looking for. 
 
 ABC: 39000  
 NBC: 25499  
@@ -25,5 +25,5 @@ CBS: 1752
 For other sources check out  
 https://sources.mediacloud.org/#/home 
 
-Pass ID into article_urls() to collect URLS for analysis  
+Pass ID into article_urls() in article-analysis.py to collect URLS for analysis  
 `urls = article_urls(ID)`
