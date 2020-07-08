@@ -1,6 +1,6 @@
 import requests, mediacloud.api
 
-def article_urls(start, rows, id):
+def article_urls(id):
     start = 0
     rows  = 1000
     while True:
@@ -8,7 +8,7 @@ def article_urls(start, rows, id):
             'last_processed_stories_id': start,
             'rows': rows,
             'q': 'media_id:' + str(id),
-            'fq': 'publish_date:[2020-06-21T07:00:00Z TO 2020-06-22T09:00:00Z]',
+            'fq': 'publish_date:[2020-06-29T07:00:00Z TO 2020-06-30T09:00:00Z]',
             'key': '56db1b3371386348692be15924705bf1c3530d7ef82c97e327073768d88f6aa1'
         }
 

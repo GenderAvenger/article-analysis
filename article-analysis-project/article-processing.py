@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 import re
 import pandas as pd
 def main():
-    urls = article_urls(0, 1000, 39000)
+    urls = article_urls(25499)
     
     complete = []
     for URL in urls:
@@ -29,6 +29,7 @@ def main():
         attempted_authors = article.authors
         sentences = sent_tokenize(main_body)
 
+        #Create genderize object
         genderize = Genderize(
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
             api_key='66982c609ec00aba67eee6fb146f6210',
@@ -41,11 +42,10 @@ def main():
         mystr = mybytes.decode("utf8")
         fp.close()
         soup = BeautifulSoup(mystr, 'lxml')
-        
-        #author = author_names(attempted_authors) #Returns array of Authors through NER
 
         try:       
-            byline = soup.find("div", class_="Byline__Author").text  #Byline through HTML 
+            #byline = soup.find("div", class_="Byline__Author").text  #Byline for ABC
+            byline = soup.find("div", class_="founders-cond f6 lh-none").text #Byline for NBC
         except:
             byline = ''
 
@@ -53,8 +53,6 @@ def main():
         author_gender = gender_of_author(authors)
         sources= extract_sources_displacy(sentences)
         source_genders = source_gender(sources, sentences)
-
-        #sources2 = extract_sources(sentences)
 
         count_he = source_genders.count('male')
         count_she = source_genders.count('female')
@@ -65,7 +63,7 @@ def main():
 
     complete_np = np.array(complete)
     df = pd.DataFrame(complete_np, columns = ['Title', 'Author', 'Gender of Author', 'Sources', 'Male Sources', 'Female Sources', 'url'])
-    df.to_csv('complete_article_data.csv')
+    df.to_csv('complete_article_data_nbc.csv')
 
 def gender_of_author(authors):
     genderize = Genderize(
@@ -111,12 +109,6 @@ def write_to_json(title, authors, gender_of_author, sources, count_male, count_f
         with open("example.json", "w") as outfile: 
             outfile.write(json_object) 
 
-def extract_sources_stanford(sentences):
-    java_path = r"C:\Program Files (x86)\Java\jre1.8.0_251\bin\java.exe"
-    os.environ['JAVAHOME'] = java_path
-    st = StanfordNERTagger('C:/Users/isabe/Downloads/stanford-ner-4.0.0/stanford-ner-4.0.0/classifiers/english.all.3class.distsim.crf.ser.gz', 'C:/Users/isabe/Downloads/stanford-ner-4.0.0/stanford-ner-4.0.0/stanford-ner-4.0.0.jar')
-    split_text = st.tag(sentence.split()) 
-
 def extract_sources_displacy(sentences):
     nlp = spacy.load('en_core_web_sm') #Load english
     sources = []
@@ -158,40 +150,6 @@ def extract_sources_displacy(sentences):
     #sources_full_name = np.array(sources_full_name)
     return sources_full_name 
            
-
-def extract_sources(sentences):
-    nlp = spacy.load('en_core_web_sm') #Load english in space  
-    sentences_with_people = []
-    for i, sentence in enumerate(sentences):
-        
-        sen = nlp(sentence)
-        quote_bool = '"' in sentence
-        quote_words_bool = ("said" or "according to" or "saying" or "say") in sentence
-        k = 0
-        person_found = False
-        while k < len(sen.ents) and person_found == False:
-            ent = sen.ents[k]
-        #while sen.ents[i].label_!= 'PERSON' and quote_words_bool == False:
-            if ent.label_ == 'PERSON' and quote_words_bool:
-                sentences_with_people.append([sentence, ent.text])
-                person_found = True
-            k = k + 1
-    sources = np.array(sentences_with_people)
-
-    #Check for empty array
-    if len(sources) == 0:
-        return sources
-    
-    sources = np.unique(sources[:,1]) #Remove repeats
-
-    #Remove Repeat Last Names
-    for name in sources[:]:
-        x = len(name.split())
-        if len(name.split()) == 1:
-            sources = np.delete(sources, np.where(sources == name))
-
-    return sources
-    
 def source_gender(sources, sentences):
     nlp = spacy.load('en_core_web_sm')
     genderize = Genderize(
@@ -224,6 +182,7 @@ def source_gender(sources, sentences):
         for d in source_genders:
             genders.append(d['gender'])
     return genders
+    
 def author_names(attempted_authors):
     entities = []
     sp = spacy.load('en_core_web_sm') #Load english in spacy
