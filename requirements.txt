@@ -1,0 +1,52 @@
+attrs==19.3.0
+beautifulsoup4 @ file:///D:/bld/beautifulsoup4_1589761082943/work
+blis==0.4.1
+brotlipy==0.7.0
+catalogue==1.0.0
+certifi==2020.4.5.2
+cffi==1.14.0
+chardet==3.0.4
+cryptography==2.9.2
+cssselect==1.1.0
+cymem @ file:///D:/bld/cymem_1591801268646/work
+en-core-web-sm==2.2.5
+feedfinder2==0.0.4
+feedparser @ file:///home/conda/feedstock_root/build_artifacts/feedparser_1590410801562/work
+gender-guesser==0.4.0
+Genderize==0.3.1
+idna==2.9
+importlib-metadata @ file:///D:/bld/importlib-metadata_1591451966421/work
+jieba3k==0.35.1
+jsonschema==3.2.0
+lxml @ file:///D:/bld/lxml_1589927701860/work
+mediacloud==3.12.0
+murmurhash==1.0.0
+newspaper3k==0.2.8
+nltk==3.4.4
+numpy==1.18.5
+olefile==0.46
+pandas @ file:///D:/bld/pandas_1592422178599/work
+Pillow==7.1.2
+plac==0.9.6
+preshed @ file:///D:/bld/preshed_1591802333328/work
+pycparser==2.20
+pyOpenSSL==19.1.0
+pyrsistent==0.16.0
+PySocks==1.7.1
+python-dateutil==2.8.1
+pytz==2020.1
+PyYAML==5.3.1
+requests==2.23.0
+requests-file @ file:///home/conda/feedstock_root/build_artifacts/requests-file_1591227832914/work
+six @ file:///home/conda/feedstock_root/build_artifacts/six_1590081179328/work
+soupsieve @ file:///D:/bld/soupsieve_1589778668225/work
+spacy @ file:///D:/bld/spacy_1589387718212/work
+srsly @ file:///D:/bld/srsly_1589222538360/work
+thinc==7.4.0
+tldextract==2.2.0
+tqdm @ file:///home/conda/feedstock_root/build_artifacts/tqdm_1591181521996/work
+urllib3==1.25.9
+wasabi==0.6.0
+win-inet-pton==1.1.0
+wincertstore==0.2
+zipp==3.1.0
